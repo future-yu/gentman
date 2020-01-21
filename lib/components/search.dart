@@ -1,6 +1,4 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:gentman/api/AppRemote.dart';
 import 'package:gentman/api/Remote.dart';
 import 'package:gentman/providers/NormalStateProvider.dart';
 import 'package:gentman/providers/SearchListProvider.dart';
@@ -33,14 +31,13 @@ class _InputSearchState extends State<InputSearch> {
   }
 
   void _onSearch() async {
-    Remote remote = AppRemote.remote;
+    Remote remote = Remote();
     try {
       _state.isloading = true;
       String searchText = _searchController.text;
       searchText = searchText.trim().replaceAll(new RegExp(r"\s+"), r"+");
       String html = await remote.exSearch(queryString: searchText);
-      EXParser exParser = EXParser(html);
-      var allData = exParser.getSearchList();
+      var allData = EXParser.getSearchList(html);
       NormalStateProvider normalStateProvider =
           Provider.of<NormalStateProvider>(context, listen: false);
       Provider.of<SearchListProvider>(context, listen: false)

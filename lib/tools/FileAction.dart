@@ -3,9 +3,25 @@ import 'dart:io';
 
 class FileAction {
   File _file;
-  FileAction(String path) {
+
+
+  // 工厂模式
+  factory FileAction(String path){
+    return _getInstance(path);
+  }
+  static FileAction _instance;
+  FileAction._internal(String path) {
     this._file = new File(path);
   }
+  static FileAction _getInstance(String path) {
+    if (_instance == null) {
+      _instance = new FileAction._internal(path);
+    }
+    return _instance;
+  }
+
+
+
   bool saveFile(content) {
     try {
       if(!this._file.existsSync()){

@@ -8,6 +8,7 @@ import 'package:gentman/models/ListItemModel.dart';
 import 'package:gentman/providers/NormalStateProvider.dart';
 import 'package:gentman/providers/SearchListProvider.dart';
 import 'package:gentman/tools/EXParser.dart';
+import 'package:gentman/tools/UserStatusAction.dart';
 import 'package:provider/provider.dart';
 import 'package:gentman/components/NetImage.dart';
 
@@ -34,11 +35,12 @@ class _SearchListState extends State<SearchList> {
         Provider.of<NormalStateProvider>(context, listen: false);
     _isloading = true;
     String searchText = state.searchText;
-    String html = await AppRemote.remote.exSearch(
+    Remote remote = Remote();
+    String html = await remote.exSearch(
       pageIndex: page,
       queryString: searchText,
     );
-    var allData = EXParser(html).getSearchList();
+    var allData = EXParser.getSearchList(html);
     state.current_page = page;
     state.max_page = allData.max_length;
     Provider.of<SearchListProvider>(context, listen: false)
@@ -53,11 +55,8 @@ class _SearchListState extends State<SearchList> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    setState(() {
-      _state = Provider.of<NormalStateProvider>(context);
-    });
-    List<Cookie> cookies =
-        AppRemote.cookieJar.loadForRequest(Uri.parse(_state.site));
+    _state = Provider.of<NormalStateProvider>(context);
+    List<Cookie> cookies = UserStatusAction().getCookies(_state.site);
     _cookieStr = Remote.getCookieStr(cookies);
   }
 
@@ -138,7 +137,7 @@ class SearchItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
+    return Consumer<NormalStateProvider>(
       builder: (BuildContext context, state, Widget child) {
         return Container(
           width: (screenWidth - 50) / 4,
@@ -154,7 +153,7 @@ class SearchItem extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: NetImage(
                         _item.cover_image_url,
-                        _item.detail_url,
+                        detail_target: _item.detail_url,
                         width: (screenWidth - 50) / 4,
                         headers: {
                           HttpHeaders.cookieHeader: cookieStr,

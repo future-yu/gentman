@@ -1,14 +1,14 @@
 import 'dart:io';
 
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:gentman/Configs.dart';
-import 'package:gentman/api/AppRemote.dart';
 import 'package:gentman/api/Remote.dart';
+import 'package:gentman/middleware/CookieInter.dart';
+import 'package:gentman/providers/NormalStateProvider.dart';
 import 'package:gentman/route/AppRouter.dart';
-import 'package:gentman/tools/AppTools.dart';
 import 'package:gentman/tools/UserStatusAction.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 //启动APP加载页面
 class LoadingPage extends StatefulWidget {
@@ -18,29 +18,26 @@ class LoadingPage extends StatefulWidget {
 
 class _LoadingState extends State<LoadingPage> {
   Future jumpPage() async {
-    UserStatusAction userStatusAction = UserStatusAction();
+    UserStatusAction state = UserStatusAction();
     Directory appDocdir = await getApplicationDocumentsDirectory();
-    //初始化cookie存储
-    PersistCookieJar cookieJar =
-        PersistCookieJar(dir: "${appDocdir.path}/.cookies/");
+
     //初始化用户配置管理
-    userStatusAction.initConfig(appDocdir);
-    Map<String, String> userInfo = userStatusAction.getUserInfo();
-    AppRemote.cookieJar = cookieJar;
-
-
+    state.initConfig(appDocdir);
+    Map<String, String> userInfo = state.getUserInfo();
     if (userInfo["site"].isNotEmpty) {
       //初始化http请求
-      AppRemote.remote =
-          Remote(Config.sites[userInfo["site"]], cookieJar: cookieJar);
+      Remote remote = Remote();
+      remote.rootUrl = Config.sites[userInfo["site"]];
+      remote.addProxy("localhost:1087");
+      remote.addInterceptor(CookieInter(state));
+      Provider.of<NormalStateProvider>(context,listen: false).site = Config.sites[userInfo["site"]];
+
     }
-    AppTools.userStatusAction = userStatusAction;
 
     //判断默认的网站选择
     switch (userInfo["site"]) {
       case "0": //exhentai
-        List cookieList =
-            cookieJar.loadForRequest(Uri.parse(Config.sites[userInfo["site"]]));
+        List cookieList = state.getCookies(Config.sites[userInfo["site"]]);
         int hasCookie = 0;
         //判断登陆状态
         cookieList.forEach((cookie) {
@@ -71,8 +68,6 @@ class _LoadingState extends State<LoadingPage> {
         );
     }
 
-    // cookieJar.saveFromResponse(Uri.parse(Config.ex_remote_url), Config.cookies);
-    // List cookieList = cookieJar.loadForRequest(Uri.parse(Config.ex_remote_url));
   }
 
   @override

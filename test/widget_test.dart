@@ -5,21 +5,49 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:io';
+
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gentman/Configs.dart';
 import 'package:gentman/api/Remote.dart';
-
+import 'package:gentman/middleware/CookieInter.dart';
+import 'package:gentman/tools/EXParser.dart';
+import 'package:http/http.dart' as http;
 import 'package:gentman/main.dart';
 
 void main() {
-  test("remote test", () async {
-    Remote remote = Remote(Config.ex_remote_url);
+  test("login test", () async {
+    Remote remote = Remote();
     remote.addProxy("localhost:1087");
     var res = await remote.loadCookies(
       username: "rulersex",
       password: "daohaodequsi",
     );
     print("object");
+  });
+  test("search test", () async {
+    Remote remote = Remote();
+    remote.rootUrl = Config.ex_remote_url;
+    remote.addProxy("localhost:8888");
+    String html = await remote.exSearch(queryString: "niku+ringo+chinese");
+    print(html);
+//    EXParser parser = EXParser(html);
+//    var data = parser.getSearchList();
+
+    print("object");
+  });
+
+  test("cookiejar test", (){
+    CookieJar cookieJar = CookieJar();
+    cookieJar.saveFromResponse(Uri.parse(Config.ex_remote_url), Config.cookies);
+    print(cookieJar.loadForRequest(Uri.parse(Config.ex_remote_url)));
+
+  });
+
+  test("http test", ()async{
+//      http.post("")
   });
 }

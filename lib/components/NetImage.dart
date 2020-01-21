@@ -8,8 +8,15 @@ class NetImage extends StatelessWidget {
   final double height;
   final double width;
   final String detail_target;
-  NetImage(this.url, this.detail_target,
-      {this.headers, this.width, this.height, Function processChange});
+
+  NetImage(
+    this.url, {
+    this.headers,
+    this.width,
+    this.height,
+    this.detail_target,
+  });
+
   @override
   Widget build(BuildContext context) {
     return IconButton(
@@ -40,7 +47,12 @@ class NetImage extends StatelessWidget {
         headers: headers,
       ),
       onPressed: () {
-        AppRouter.router.navigateTo(context, "/image/detail?target=${Uri.encodeComponent(detail_target)}");
+        if (this.detail_target != null) {
+          AppRouter.router.navigateTo(
+            context,
+            "/image/detail?target=${Uri.encodeComponent(detail_target)}",
+          );
+        }
       },
     );
   }

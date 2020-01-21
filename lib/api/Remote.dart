@@ -3,24 +3,66 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/rendering.dart';
 import 'package:gentman/Configs.dart';
 import 'package:gentman/api/AppRemote.dart';
 import 'package:gentman/middleware/BrowserDisguise.dart';
+import 'package:gentman/middleware/CookieInter.dart';
+import 'package:gentman/tools/UserStatusAction.dart';
+
+class Manager {
+  // 工厂模式
+  factory Manager() =>_getInstance();
+  static Manager get instance => _getInstance();
+  static Manager _instance;
+  Manager._internal() {
+    // 初始化
+  }
+  static Manager _getInstance() {
+    if (_instance == null) {
+      _instance = new Manager._internal();
+    }
+    return _instance;
+  }
+}
+
 
 class Remote {
   Dio dio = Dio();
-  Remote(String rootUrl, {CookieJar cookieJar}) {
-    dio.options.baseUrl = rootUrl;
+  String _rootUrl;
+  // 工厂模式
+  factory Remote(){
+    return _getInstance();
+  }
+  static Remote get instance => _getInstance();
+  static Remote _instance;
+  Remote._internal() {
     dio.options.connectTimeout = 5000; //5s
     dio.options.receiveTimeout = 3000;
-    dio.interceptors.add(BrowserDisguise());
-//    dio.interceptors.add(CookieManager(cookieJar));
+    addInterceptor(BrowserDisguise());
+  }
+  static Remote _getInstance() {
+    if (_instance == null) {
+      _instance = new Remote._internal();
+    }
+    return _instance;
   }
 
+  //设置rooturl
+  set rootUrl(value){
+    _rootUrl = value;
+    dio.options.baseUrl = _rootUrl;
+  }
+
+  //cookie转str
   static String getCookieStr(List<Cookie> cookies) {
     return cookies.map((cookie) => "${cookie.name}=${cookie.value}").join('; ');
   }
 
+  void addInterceptor(Interceptor interceptor){
+    dio.interceptors.add(interceptor);
+  }
   ///cookie转str
   static Map<String, String> cookiesToStr(List<String> cookies) {
     Map<String, String> cookieInfo = {};
@@ -59,10 +101,14 @@ class Remote {
         "f_search": queryString,
         "page": pageIndex,
       });
-      
       String remote_url = "${Config.ex_remote_url}?$queryStr";
       Response response = await dio.get(
         remote_url,
+        options: RequestOptions(
+          headers: {
+            HttpHeaders.cookieHeader:Remote.getCookieStr(Config.cookies),
+          }
+        ),
       );
       return response.data;
     } catch (e) {
@@ -83,25 +129,26 @@ class Remote {
           "b": "d",
           "bt": "1-2",
           "ipb_login_submit": "Login!",
+          "temporary_https":"off",
         },
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
+          headers: {
+            HttpHeaders.refererHeader:"https://e-hentai.org/bounce_login.php?b=d&bt=1-1",
+          }
         ),
       );
 
-      CookieJar cookieJar = AppRemote.cookieJar;
-      List<String> cookiesStr = response.headers[HttpHeaders.setCookieHeader];
-
-      if (cookiesStr != null) {
-        List<String> cookies = response.headers[HttpHeaders.setCookieHeader];
-        if (cookies != null) {
-          cookieJar.saveFromResponse(
-            Uri.parse(Config.ex_remote_url),
-            cookies.map((str) => Cookie.fromSetCookieValue(str)).toList(),
-          );
-        }
+      //存储cookie
+      if (response != null && response.headers != null) {
+        List<String> cookiesStr = response.headers[HttpHeaders.setCookieHeader];
+        List<Cookie> cookies = cookiesStr.map((str) => Cookie.fromSetCookieValue(str)).toList();
+        UserStatusAction state = UserStatusAction();
+        state.setCookies(
+          Config.ex_remote_url,
+          cookies,
+        );
       }
-
       return true;
     } catch (e) {
       return false;
@@ -110,7 +157,11 @@ class Remote {
 
   Future<String> getHtml(String target) async {
     try {
-      Response response = await dio.get(target);
+      Response response = await dio.get(target,options:RequestOptions(
+        headers: {
+          HttpHeaders.cookieHeader:getCookieStr(Config.cookies),
+        }
+      ),);
       return response.data;
     } catch (e) {
       throw e;

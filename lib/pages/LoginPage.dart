@@ -53,21 +53,23 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     void login() async {
       var provider = Provider.of<NormalStateProvider>(context, listen: false);
-      UserStatusAction userStatusAction = AppTools.userStatusAction;
-
+      UserStatusAction state = UserStatusAction();
+      //存储选中到site
       provider.setSite(_select);
+
+      //不是exhentai直接跳页面，不用获取cookie
       if (!_showInput) {
-        userStatusAction.setUserConfigure({
+        state.setUserConfigure({
           "site": Config.sites[_select],
         });
         AppRouter.router.navigateTo(context, '/');
         return;
       }
 
-      Remote remote =
-          Remote(Config.sites[_select], cookieJar: AppRemote.cookieJar);
-      remote.addProxy("localhost:1087");
-      AppRemote.remote = remote;
+      Remote remote = Remote();
+      remote.rootUrl = Config.sites[_select];
+
+      //获取cookie
       if (_hasClick == false) {
         setState(() {
           this._hasClick = true;
@@ -77,9 +79,12 @@ class _LoginPageState extends State<LoginPage> {
           password: _pwdController.text,
         );
         if (cookieInit) {
-          userStatusAction.setUserConfigure({
-            "site": Config.sites[_select],
+          state.setUserConfigure({
+            "site": _select,
+            "username":_usernameController.text,
+            "password":_pwdController.text,
           });
+          remote.rootUrl = Config.sites[_select];
           AppRouter.router.navigateTo(context, '/');
         } else {
           Fluttertoast.showToast(

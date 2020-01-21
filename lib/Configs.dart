@@ -1,5 +1,4 @@
 import 'dart:io';
-
 class Config{
   static final  ex_remote_url= "https://exhentai.org/";
   static final e_remote_url="https://e-hentai.org/";
@@ -12,10 +11,12 @@ class Config{
     "3": "http://127.0.0.1:9001",
   };
   static final cookies = [
+//    Cookie("ipb_coppa","0"),
+//    Cookie("ipb_session_id","1d08bec892bbe300407407495cd8a0eb"),
     Cookie("igneous", "823a80955"),
-    Cookie("ipb_member_id", "3495927"),
-    Cookie("ipb_pass_hash", "24aab63fc4577147b9883472a9db83b2"),
-    Cookie("sk", "qrle2ilitrd9pwfdugecs9raq5sr")
+    Cookie("ipb_member_id", "3495927"),//3495927
+    Cookie("ipb_pass_hash", "24aab63fc4577147b9883472a9db83b2"),//24aab63fc4577147b9883472a9db83b2
+//    Cookie("sk", "qrle2ilitrd9pwfdugecs9raq5sr")
   ];
   static final login_url= "https://forums.e-hentai.org/index.php?act=Login&CODE=01";
   static final Headers = {
