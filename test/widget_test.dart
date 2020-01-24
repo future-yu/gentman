@@ -5,18 +5,11 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gentman/Configs.dart';
 import 'package:gentman/api/Remote.dart';
-import 'package:gentman/middleware/CookieInter.dart';
-import 'package:gentman/tools/EXParser.dart';
-import 'package:http/http.dart' as http;
-import 'package:gentman/main.dart';
 
 void main() {
   test("login test", () async {

@@ -2,11 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gentman/Configs.dart';
-import 'package:gentman/api/AppRemote.dart';
 import 'package:gentman/api/Remote.dart';
 import 'package:gentman/providers/NormalStateProvider.dart';
 import 'package:gentman/route/AppRouter.dart';
-import 'package:gentman/tools/AppTools.dart';
 import 'package:gentman/tools/UserStatusAction.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +34,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setState(() {
       _select = "0";
@@ -44,8 +41,8 @@ class _LoginPageState extends State<LoginPage> {
       _hasClick = false;
       _usernameController = TextEditingController();
       _pwdController = TextEditingController();
-      _usernameController.text = "rulersex"; //this._username;
-      _pwdController.text = "daohaodequsi"; //this._password;
+      _usernameController.text = this._username;
+      _pwdController.text = this._password;
     });
   }
 
@@ -62,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
         state.setUserConfigure({
           "site": Config.sites[_select],
         });
-        AppRouter.router.navigateTo(context, '/');
+        AppRouter.router.navigateTo(context, '/home');
         return;
       }
 
@@ -85,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
             "password":_pwdController.text,
           });
           remote.rootUrl = Config.sites[_select];
-          AppRouter.router.navigateTo(context, '/');
+          AppRouter.router.navigateTo(context, '/home');
         } else {
           Fluttertoast.showToast(
             msg: "用户名或密码错误!",

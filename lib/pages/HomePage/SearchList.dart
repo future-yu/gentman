@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gentman/api/AppRemote.dart';
 import 'package:gentman/api/Remote.dart';
 import 'package:gentman/models/ListItemModel.dart';
 import 'package:gentman/providers/NormalStateProvider.dart';
@@ -18,7 +17,6 @@ class SearchList extends StatefulWidget {
 }
 
 class _SearchListState extends State<SearchList> {
-  static const loadingTag = "##loading##"; //表尾标记
   int _currentPage = 0;
   int _maxPage;
   String _cookieStr;
@@ -28,11 +26,10 @@ class _SearchListState extends State<SearchList> {
 
   ScrollController _controller = new ScrollController();
 
-  List<ListItemModel> _items = [];
 
-  void _loadList(int page) async {
+  void _loadList(int page,bool isInit) async {
     NormalStateProvider state =
-        Provider.of<NormalStateProvider>(context, listen: false);
+        Provider.of<NormalStateProvider>(context);
     _isloading = true;
     String searchText = state.searchText;
     Remote remote = Remote();
@@ -43,8 +40,14 @@ class _SearchListState extends State<SearchList> {
     var allData = EXParser.getSearchList(html);
     state.current_page = page;
     state.max_page = allData.max_length;
-    Provider.of<SearchListProvider>(context, listen: false)
+    if(isInit){
+Provider.of<SearchListProvider>(context,listen: false)
+        .initAllList(allData.list);
+    }else{
+      Provider.of<SearchListProvider>(context,listen: false)
         .addSearchList(allData.list);
+    }
+    
     setState(() {
       _maxPage = allData.max_length;
       _currentPage = page;
@@ -58,18 +61,18 @@ class _SearchListState extends State<SearchList> {
     _state = Provider.of<NormalStateProvider>(context);
     List<Cookie> cookies = UserStatusAction().getCookies(_state.site);
     _cookieStr = Remote.getCookieStr(cookies);
+    _loadList(_currentPage,true);
   }
 
   @override
   void initState() {
     super.initState();
-    _loadList(_currentPage);
     _controller.addListener(() {
       if (_controller.position.maxScrollExtent - _controller.position.pixels <
           10.0) {
         if (_currentPage < _maxPage) {
           if (!_isloading) {
-            _loadList(++_currentPage);
+            _loadList(++_currentPage,false);
           }
         }
       }

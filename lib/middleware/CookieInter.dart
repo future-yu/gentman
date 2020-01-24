@@ -18,8 +18,6 @@ class CookieInter extends Interceptor {
       return false;
     });
     String cookie = getCookies(cookies);
-    print(getCookies(Config.cookies));
-    print(cookie);
     if (cookie.isNotEmpty) {
       options.headers[HttpHeaders.cookieHeader] = cookie;
     }

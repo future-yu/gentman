@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:gentman/tools/AppTools.dart';
 import 'package:gentman/tools/FileAction.dart';
 import 'package:gentman/tools/MapAction.dart';
 class UserStatusAction {

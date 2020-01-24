@@ -21,6 +21,7 @@ class _InputSearchState extends State<InputSearch> {
     super.didChangeDependencies();
     setState(() {
       _state = Provider.of<NormalStateProvider>(context);
+      _searchController.text = _state.searchText;
     });
   }
 

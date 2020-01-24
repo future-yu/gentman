@@ -9,7 +9,6 @@ class CollectionPage extends StatefulWidget{
 class _CollectionPageState extends State<CollectionPage>{
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build 
-    return null;
+    return Text("collect");
   }
 }

@@ -19,41 +19,42 @@ class NetImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      padding: EdgeInsets.zero,
-      iconSize: width,
-      icon: Image.network(
-        url,
-        loadingBuilder: (
-          BuildContext context,
-          Widget widget,
-          ImageChunkEvent chunk,
-        ) {
-          if (chunk == null) {
-            return widget;
-          } else {
-            return CircularProgressIndicator(
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation(Colors.blue),
-              value: chunk.expectedTotalBytes != null
-                  ? chunk.cumulativeBytesLoaded / chunk.expectedTotalBytes
-                  : null,
+    return ConstrainedBox(
+      constraints: BoxConstraints.expand(),
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        icon: Image.network(
+          url,
+          loadingBuilder: (
+            BuildContext context,
+            Widget widget,
+            ImageChunkEvent chunk,
+          ) {
+            if (chunk == null) {
+              return widget;
+            } else {
+              return CircularProgressIndicator(
+                backgroundColor: Colors.grey[200],
+                valueColor: AlwaysStoppedAnimation(Colors.blue),
+                value: chunk.expectedTotalBytes != null
+                    ? chunk.cumulativeBytesLoaded / chunk.expectedTotalBytes
+                    : null,
+              );
+            }
+          },
+          fit: BoxFit.cover,
+          headers: headers,
+        ),
+        onPressed: () {
+          if (this.detail_target != null) {
+            AppRouter.router.navigateTo(
+              context,
+              "/image/detail?target=${Uri.encodeComponent(detail_target)}",
             );
           }
         },
-        width: width,
-        height: height,
-        fit: BoxFit.cover,
-        headers: headers,
-      ),
-      onPressed: () {
-        if (this.detail_target != null) {
-          AppRouter.router.navigateTo(
-            context,
-            "/image/detail?target=${Uri.encodeComponent(detail_target)}",
-          );
-        }
-      },
+      
+    ),
     );
   }
 }

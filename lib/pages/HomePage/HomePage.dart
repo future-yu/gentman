@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gentman/components/search.dart';
-import 'package:gentman/components/search_list.dart';
+import 'package:gentman/pages/HomePage/InputSearch.dart';
+import 'package:gentman/pages/HomePage/SearchList.dart';
 
 class HomePage extends StatefulWidget{
 

@@ -1,6 +1,6 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-import 'package:gentman/pages/DetailPage.dart';
+import 'package:gentman/pages/DetailPage/DetailPage.dart';
 import 'package:gentman/pages/IndexPage.dart';
 import 'package:gentman/pages/LoginPage.dart';
 
@@ -10,9 +10,22 @@ Handler loginHandler = Handler(
     }
 );
 
-Handler rootHandler  = Handler(
+Handler userHandler  = Handler(
   handlerFunc: (BuildContext context,Map<String,List<String>> params){
-    return IndexPage();
+    return IndexPage(2);
+  }
+); 
+
+
+Handler collectHandler  = Handler(
+  handlerFunc: (BuildContext context,Map<String,List<String>> params){
+    return IndexPage(1);
+  }
+);
+
+Handler homeHandler  = Handler(
+  handlerFunc: (BuildContext context,Map<String,List<String>> params){
+    return IndexPage(0);
   }
 );
 
@@ -28,5 +41,7 @@ Handler detailHandler = Handler(
 Map<String,Handler> routeMap={
   "/login":loginHandler,
   "/image/detail":detailHandler,
-  "/":rootHandler,
+  "/home":homeHandler,
+  "/collect":collectHandler,
+  "/user":userHandler,
 };

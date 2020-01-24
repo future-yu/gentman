@@ -53,13 +53,13 @@ class _LoadingState extends State<LoadingPage> {
             "/login?uname=${userInfo['username']}&&pwd=${userInfo['password']}",
           );
         } else {
-          AppRouter.router.navigateTo(context, "/");
+          AppRouter.router.navigateTo(context, "/home");
         }
         break;
       case "1":
       case "2":
       case "3":
-        AppRouter.router.navigateTo(context, "/");
+        AppRouter.router.navigateTo(context, "/home");
         break;
       default:
         AppRouter.router.navigateTo(
